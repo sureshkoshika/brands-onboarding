@@ -1,10 +1,8 @@
- --[[[[Reactive metrics]]]]]
+--[Reactive metrics]
 --Brand Enrollment Metrics - Customer Engagement
---Table 3A - Total BRANDS enrolled by region:
---3A.1-Submitted brands cumulative
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
----Query
 --- Query
 select * from
 (With 
