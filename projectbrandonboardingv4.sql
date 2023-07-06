@@ -10,8 +10,8 @@ select * from
 
     (SELECT   y.sales_team
            , count(distinct(x.brand_id)) as Previous_week_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     group by y.sales_team
     Order by y.sales_team
@@ -19,8 +19,8 @@ select * from
 , one_week_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.brand_id)) as a_week_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null
@@ -30,8 +30,8 @@ select * from
 , two_week_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.brand_id)) as two_weeks_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null
@@ -41,8 +41,8 @@ select * from
 , three_week_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.brand_id)) as three_weeks_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null
@@ -52,13 +52,13 @@ select * from
 , wow_new_brands_enrollment AS
    (SELECT   y.sales_team
         , COALESCE(count(distinct(x.brand_id)),0) as wow_brands_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -89,33 +89,33 @@ union all
  tot_lastweek as
       (SELECT 1 as total
            , count(distinct(brand_id )) previous_week_submitted_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS)
+       FROM table1)
 , a_week_ago as
       (SELECT 1 as total
             , count(distinct(brand_id )) one_week_ago_submitted_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null)  
 , two_week_ago as
       (SELECT 1 as total
             , count(distinct(brand_id )) two_week_ago_submitted_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null) 
 , three_week_ago as
       (SELECT 1 as total
             , count(distinct(brand_id )) three_weeks_ago_submitted_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null) 
 , wow_new_brands_enrollment AS
       (SELECT 1 as total
            , COALESCE(count(distinct(brand_id)),0) as wow_submitted_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS 
+       FROM table1 
        WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
         AND (first_content_publish_date BETWEEN
@@ -155,8 +155,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as Previous_week_onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     
     group by y.sales_team
@@ -169,8 +169,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as a_week_ago_onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null
@@ -184,8 +184,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as two_weeks_ago_onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null
@@ -199,8 +199,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as three_weeks_ago_onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null
@@ -214,13 +214,13 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as wow_onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -255,7 +255,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN brand_id else null end))) previous_week_total_onboarded
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS)
+       FROM table1)
 , a_week_ago as
       (SELECT 1 as total
             , count(distinct( (case when (image_status ilike 'published' or
@@ -263,7 +263,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN brand_id else null end))) a_week_ago_total_onboarded
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null)   
 , two_week_ago as
@@ -273,7 +273,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN brand_id else null end))) two_weeks_ago_total_onboarded
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null)  
 , three_weeks_ago as
@@ -283,7 +283,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN brand_id else null end))) three_weeks_ago_total_onboarded
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null)
 , wow_new_brands_enrollment AS
@@ -293,11 +293,11 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN brand_id else null end))) as wow_total_onboarded
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS 
+       FROM table1 
        WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
         AND (first_content_publish_date BETWEEN
@@ -332,8 +332,8 @@ select * from
 
     (SELECT   y.sales_team
            , count(distinct(x.asin)) as Previous_week_CUM_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     group by y.sales_team
     Order by y.sales_team
@@ -341,8 +341,8 @@ select * from
 , one_week_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.asin)) as a_week_ago_CUM_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null
@@ -352,8 +352,8 @@ select * from
 , two_week_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.asin)) as two_weeks_ago_CUM_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null
@@ -363,8 +363,8 @@ select * from
 , three_weeks_ago_cumulative AS
     (SELECT   y.sales_team
            , count(distinct(x.asin)) as three_weeks_ago_CUM_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null
@@ -374,13 +374,13 @@ select * from
 , wow_new_asins_enrollment AS
    (SELECT   y.sales_team
         , COALESCE(count(distinct(x.asin)),0) as wow_asins_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     WHERE  (asin not in (
                        SELECT 
                                distinct(asin ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -411,33 +411,33 @@ union all
  tot_lastweek as
       (SELECT 1 as total
            , count(distinct(asin )) previous_week_total_submitted_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS)
+       FROM table1)
 , a_week_ago as
       (SELECT 1 as total
             , count(distinct(asin )) a_week_total_submitted_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null)  
 , two_week_ago as
       (SELECT 1 as total
             , count(distinct(asin )) two_weeks_total_submitted_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null) 
 , three_week_ago as
       (SELECT 1 as total
             , count(distinct(asin )) three_weeks_total_submitted_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null) 
 , wow_new_asins_enrollment AS
       (SELECT 1 as total
            , COALESCE(count(distinct(asin)),0) as wow_total_asins_submitted
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS 
+       FROM table1 
        WHERE  (asin not in (
                        SELECT 
                                distinct(asin ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
         AND (first_content_publish_date BETWEEN
@@ -477,8 +477,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.asin else null end))) as Previous_week_CUM_onboarded_asins
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     
     group by y.sales_team
@@ -491,8 +491,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.asin else null end))) as a_week_ago_CUM_onboarded_asins
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null
@@ -506,8 +506,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.asin else null end))) as two_weeks_ago_CUM_onboarded_asins
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null
@@ -521,8 +521,8 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.asin else null end))) as three_weeks_ago_CUM_onboarded_asins
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null
@@ -536,13 +536,13 @@ select * from
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.asin else null end))) as wow_asins_Onboarded
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
-    left join v_transparency_account y
+    FROM table1 x
+    left join table2 y
     on x.account_id = y.account_id
     WHERE  (asin not in (
                        SELECT 
                                distinct(asin ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -577,7 +577,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN asin else null end))) Previous_week_CUM_total_onboarded_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS)
+       FROM table1)
 , a_week_ago as
       (SELECT 1 as total
             , count(distinct( (case when (image_status ilike 'published' or
@@ -585,7 +585,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN asin else null end))) a_week_ago_CUM_total_onboarded_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null) 
 , two_week_ago as
@@ -595,7 +595,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN asin else null end))) two_weeks_ago_CUM_total_onboarded_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null) 
 , three_weeks_ago as
@@ -605,7 +605,7 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN asin else null end))) three_weeks_ago_CUM_total_onboarded_asins
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null) 
 , wow_new_asins_enrollment AS
@@ -615,11 +615,11 @@ union all
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN asin else null end))) as wow_asins_onboarded_total
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS 
+       FROM table1 
        WHERE  (asin not in (
                        SELECT 
                                distinct(asin ) asins
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
         AND (first_content_publish_date BETWEEN
@@ -664,7 +664,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then brand_id else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS)
+     from table1)
 , a_week_ago_Ce_feature_adoptation as
    (select   1 as brand_slash_asin
        , count(distinct(case when image_status ilike 'Published' then brand_id else null end)) as image
@@ -677,7 +677,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then brand_id else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null)
 , Two_week_ago_Ce_feature_adoptation as
@@ -692,7 +692,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then brand_id else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null)
 , Three_weeks_ago_Ce_feature_adoptation as
@@ -707,7 +707,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then brand_id else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null)
 , wow_ce_adoptation as
@@ -722,11 +722,11 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then brand_id else null 
                         end)) as Any_feature
-      from tpncy_report.CUST_ENG_CASE_DETAILS
+      from table1
       WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
       AND  (datediff(week,first_content_publish_date,CURRENT_DATE)  <=1))
@@ -768,7 +768,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then asin else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS)
+     from table1)
 , a_week_ago_Ce_feature_adoptation as
    (select   1 as brand_slash_asin
        , count(distinct(case when image_status ilike 'Published' then asin else null end)) as image
@@ -781,7 +781,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then asin else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     first_content_publish_date is null)
 , Two_week_ago_Ce_feature_adoptation as
@@ -796,7 +796,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then asin else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     first_content_publish_date is null)
 , Three_weeks_ago_Ce_feature_adoptation as
@@ -811,7 +811,7 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then asin else null 
                         end)) as Any_feature
-     from tpncy_report.CUST_ENG_CASE_DETAILS
+     from table1
      where first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     first_content_publish_date is null)
 , wow_ce_adoptation as
@@ -826,11 +826,11 @@ lastweek_Ce_feature_adoptation as
                                   or promotions ilike 'published')
                              then asin else null 
                         end)) as Any_feature
-      from tpncy_report.CUST_ENG_CASE_DETAILS
+      from table1
       WHERE  (asin not in (
                        SELECT 
                                distinct(asin ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
       AND  (datediff(week,first_content_publish_date,CURRENT_DATE)  <=1))
@@ -866,34 +866,34 @@ SELECT * FROM
 
     (SELECT   1 as total
            , count(distinct(x.brand_id)) as Previous_week_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     ) 
 , one_week_ago_cumulative AS
     (SELECT   1 as total
            , count(distinct(x.brand_id)) as a_week_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null)
 , two_week_ago_cumulative AS
     (SELECT  1 as total
            , count(distinct(x.brand_id)) as two_weeks_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null)
 , three_week_ago_cumulative AS
     (SELECT  1 as total
            , count(distinct(x.brand_id)) as three_weeks_ago_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null)
 , wow_brands_submission  AS
    (SELECT   1 as total
         , COALESCE(count(distinct(x.brand_id)),0) as wow_brands_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -931,7 +931,7 @@ With
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as Previous_week_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     ) 
 , one_week_ago_cumulative AS
     (SELECT   1 as total
@@ -940,7 +940,7 @@ With
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as a_week_ago_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '1 week')) OR
     x.first_content_publish_date is null)
 , two_week_ago_cumulative AS
@@ -950,7 +950,7 @@ With
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as two_weeks_ago_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '2 week')) OR
     x.first_content_publish_date is null)
 , three_week_ago_cumulative AS
@@ -960,7 +960,7 @@ With
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as three_weeks_ago_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     where x.first_content_publish_date   < (date_trunc('week', GETDATE() - INTERVAL '3 week')) OR
     x.first_content_publish_date is null)
 , wow_brands_published  AS
@@ -970,11 +970,11 @@ With
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as wow_brands_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -1011,7 +1011,7 @@ FROM
 (select  
       (SELECT 
        count(distinct(brand_id ))brands
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS) - 
+       FROM table1) - 
 
       (SELECT 
        count(distinct(case when (image_status ilike 'published' or
@@ -1020,10 +1020,10 @@ FROM
                                 promotions ilike 'published')
              THEN brand_id else null
         end ))brands
-        FROM tpncy_report.CUST_ENG_CASE_DETAILS) as Present_week_inprogress
+        FROM table1) as Present_week_inprogress
 ,  (SELECT 
        count(distinct(brand_id ))brands
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week')) ) - 
 
       (SELECT 
@@ -1033,11 +1033,11 @@ FROM
                                 promotions ilike 'published')
              THEN brand_id else null
         end ))brands
-        FROM tpncy_report.CUST_ENG_CASE_DETAILS
+        FROM table1
         WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week')) ) as a_week_ago_inprogress
 ,  (SELECT 
        count(distinct(brand_id ))brands
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '2 week')) ) - 
 
       (SELECT 
@@ -1047,11 +1047,11 @@ FROM
                                 promotions ilike 'published')
              THEN brand_id else null
         end ))brands
-        FROM tpncy_report.CUST_ENG_CASE_DETAILS
+        FROM table1
         WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '2 week')) ) as two_weeks_ago_inprogress
 ,  (SELECT 
        count(distinct(brand_id ))brands
-       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+       FROM table1
        WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '3 week')) ) - 
 
       (SELECT 
@@ -1061,15 +1061,15 @@ FROM
                                 promotions ilike 'published')
              THEN brand_id else null
         end ))brands
-        FROM tpncy_report.CUST_ENG_CASE_DETAILS
+        FROM table1
         WHERE uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '3 week')) ) as three_weeks_ago_inprogress
 , ((SELECT   
          COALESCE(count(distinct(x.brand_id)),0) as wow_brands_submitted
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
@@ -1081,11 +1081,11 @@ FROM
                                         video_upload_status ilike 'published' or
                                         promotions ilike 'published')
                               THEN x.brand_id else null end))) as wow_brands_published
-    FROM tpncy_report.CUST_ENG_CASE_DETAILS x
+    FROM table1 x
     WHERE  (brand_id not in (
                        SELECT 
                                distinct(brand_id ) brands
-                       FROM tpncy_report.CUST_ENG_CASE_DETAILS
+                       FROM table1
                        where uploaded_date  < (date_trunc('week', GETDATE() - INTERVAL '1 week'))
                           ))
      AND (first_content_publish_date BETWEEN
